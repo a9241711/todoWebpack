@@ -1,7 +1,7 @@
 const path=require("path");
 module.exports={
     //建置模式
-    mode:"development",//預設production
+    mode:"development",//預設production,development
     //入口
     entry:"./src/index.js",
     //輸出

@@ -9,7 +9,7 @@ const Home = () => {
         <h1>Hello</h1>
         <p style={{ display: "inline-block" }}>歡迎使用TodoList</p>
       </header>
-      <Link  to={"/list"} > 前往List</Link>
+      <Link  to="/list" > 前往List</Link>
     </div>
   );
 };

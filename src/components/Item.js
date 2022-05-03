@@ -1,10 +1,19 @@
+import { getDocs, deleteDoc, collection, where, query } from 'firebase/firestore';
 import React from 'react';
+import { db } from '../firebaseconfig';
 
-const Item = ({ deleteData, data }) => {
-  console.log(data);
-  const handleDelete = (e) => {
+
+const Item = ({ deleteData,setIsDelte, data }) => {
+
+  const handleDelete = async(e) => {
     const currentId = e.target.parentElement.id;
-    deleteData((prev) => prev.filter((item) => item.id !== currentId));
+    console.log(currentId);
+    const deleteRef=query(collection(db,"notelist"),where("id","==",currentId));
+    const querySnapshot = await getDocs(deleteRef);
+    querySnapshot.forEach((item)=>{
+      deleteDoc(item.ref);
+    })
+    setIsDelte(true);
   };
   return (
     <div className="itemList">

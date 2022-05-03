@@ -1,22 +1,51 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import Item from "./Item";
 import { v4 } from "uuid";
 import { Link } from "react-router-dom";
 import React from 'react';
-
+import { db } from "../firebaseconfig";
+import { addDoc,collection,getDocs,orderBy,query,Timestamp } from "firebase/firestore";
 
 const List=()=>{
     const[data,setData]=useState([]);
-    const[text,setText]=useState("")
+    const[text,setText]=useState("");
+    const[isSummit,setIsSubmmit]=useState(true);
+    const[idDelete,setIsDelte]=useState(false);
 
     const handleTextValue=(e)=>{
         setText(e.target.value);
     }
-    const handleSubmmitDbtn=()=>{
+    const handleSubmmitDbtn=async ()=>{
+        setIsSubmmit(true);
         const id=v4();
-        setData((prev)=> [{id,text},...prev]);
-        setText("")
+        const ref=collection(db,"notelist");
+        const time=Timestamp.now();
+        const obj={id,text,time:time["seconds"]}
+        try{
+            await addDoc(ref,obj);
+        }
+        catch(e){
+            console.log(e);
+        }
+        setText("");
     }
+
+    useEffect(()=>{
+        
+        async function getListFromDb(){
+            const listRef=query(collection(db,"notelist"),orderBy("time","desc"));
+            const data=await getDocs(listRef);
+            const dataArr=[]
+            data.forEach((doc)=>{
+                const{id,text}=doc.data();
+                dataArr.push({id,text});
+            })
+            setData(dataArr);
+        }
+        setIsSubmmit(false);
+        setIsDelte(false);
+        return()=>getListFromDb()
+    },[isSummit,idDelete])
     return(
         <>
         <div className="listDiv">
@@ -30,7 +59,7 @@ const List=()=>{
             </button>
             </div>
         </div>
-        <Item  data={data}  deleteData={setData}/>
+        <Item  data={data} setIsDelte={setIsDelte} deleteData={setData}/>
         </>
     )
 
